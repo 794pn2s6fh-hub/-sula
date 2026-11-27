@@ -195,7 +195,10 @@ func promptForVersionId(appId: String, versionIds: [String], ipaTool: IPATool) {
             downgradeAppToVersion(appId: appId, versionId: versionId, ipaTool: ipaTool)
         }))
     }
-    alert.addAction(UIAlertAction(title: String(localized: "action.cancel"), style: .cancel, handler: nil))
+    alert.addAction(UIAlertAction(title: String(localized: "action.cancel"), style: .cancel, handler: { _ in
+        StoreData.shared.isDowngrading = false
+        StoreData.shared.isGettingVersions = false
+    }))
     UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: nil)
 }
 
@@ -293,31 +296,6 @@ private func parseServerVersionHistory(_ data: Data) throws -> [ServerAppVersion
             externalIdentifier: externalIdentifier
         )
     }
-}
-
-func promptForVersionId(appId: String, versionIds: [String], ipaTool: IPATool) {
-    let isiPad = UIDevice.current.userInterfaceIdiom == .pad
-    let alert = UIAlertController(
-        title: String(localized: "alert.version.enter.title"),
-        message: String(localized: "alert.version.enter.message"),
-        preferredStyle: isiPad ? .alert : .actionSheet
-    )
-    for versionId in versionIds {
-        alert.addAction(UIAlertAction(title: versionId, style: .default, handler: { _ in
-            downgradeAppToVersion(appId: appId, versionId: versionId, ipaTool: ipaTool)
-        }))
-    }
-    alert.addAction(UIAlertAction(title: String(localized: "action.cancel"), style: .cancel, handler: { _ in
-        StoreData.shared.isDowngrading = false
-        StoreData.shared.isGettingVersions = false
-    }))
-    UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: nil)
-}
-
-func showAlert(title: String, message: String) {
-    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: String(localized: "action.ok"), style: .default, handler: nil))
-    UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: nil)
 }
 
 func getAllAppVersionIdsFromServer(appId: String, ipaTool: IPATool) {
